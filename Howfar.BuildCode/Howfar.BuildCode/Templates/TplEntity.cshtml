@@ -1,0 +1,49 @@
+﻿using Panto.Map.Extensions.DAL;
+using PDRZ.Integration.Entity.InternalPlatForm.Base;
+using System;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+
+namespace PDRZ.Integration.Entity.School.AssetModule
+{
+    /// <summary>
+    /// @Model.ConfigInfo.EntityName 的实体类
+    ///</summary>
+    [DataContract]
+    [Serializable]
+    [DataEntity(Alias = "@Model.ConfigInfo.EntityName")]
+    public partial class @Model.ConfigInfo.ModelFolderName : WithSchoolIDBaseEntity
+    {
+        #region 标准字段
+        @foreach (var item in Model.ColList)
+        {
+        @:/// <summary>
+        @:/// @item.Comment
+        @:///</summary>
+        @:[DataMember]
+        if(item.IsDataColumn && item.IsPK == true)
+        {
+        @:[DataColumn(PrimaryKey = true)]
+        }
+        else
+        {
+        @:[DataColumn(IsNullable = @(item.NotNUll?"false":"true"))]
+        }
+        @:[Description("@item.Comment")]
+        @:public @item.CsharpType @item.ColumnName { get; set; }
+        }
+        #endregion
+
+        #region 扩展字段
+        @foreach (var item in Model.ExtColList)
+        {
+        @:/// <summary>
+        @:/// @item.Comment
+        @:///</summary>
+        @:[DataMember]
+        @:[Description("@item.Comment")]
+        @:public @item.CsharpType @item.ColumnName { get; set; }
+        }
+        #endregion
+    }
+}

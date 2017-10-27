@@ -1,0 +1,161 @@
+﻿var @Model.OName = {};
+
+$(function () {
+    //加载表头和表格
+    $("#grid").initTableHeader(@(Model.OName).opt);
+    @(Model.OName).refreshTable();
+
+    //编辑页面
+    $(document).on("click", "#grid tbody tr td:nth-child(2) a", function () {
+    var id = $($(this).parent().parent().children()[0]).find("input").attr("data-id");
+    @(Model.OName).edit(id);
+    });
+
+    //回车事件
+    document.onkeydown = function (e) {
+    var ev = document.all ? window.event : e;
+    if (ev.keyCode == 13) {
+    $("#btnQuery").focus();
+    }
+    }
+
+    });
+
+
+    (function (ns) {
+    ns.getCondition = function () {
+    var param = {
+    @Model.ListJSCond
+    };
+    return JSON.stringify(param);
+    }
+
+    ns.opt = {
+    name: "@Model.ConfigInfo.TableComment",
+    url: "/@Model.ConfigInfo.ModelFolderName/@Model.ConfigInfo.ControllerName/GetPageList",
+    tHeader: [
+@foreach (var item in Model.List)
+{
+    string align = "left";
+    if (item.TypeName.Contains("int"))
+    {
+        align = "right";
+    }
+    else if (item.TypeName.ToLower().Contains("date"))
+    {
+        align = "center";
+    }
+    <text>    {
+        name: "@item.Comment",
+        width: "120px",
+        sortable: "true",
+        selectName: "@item.ColumnName",
+        align: "@align"
+    },
+</text>}
+    ],
+    data: {
+    combinSearchText: ns.getCondition(),
+    orderSeq: "CreateDate DESC",
+    pageNo: 1,
+    pageSize: 20
+    },
+    checkAll: { data_id: "@Model.ConfigInfo.PKName", flag: true }
+    }
+
+    //刷新列表
+    ns.refreshTable = function () {
+    $("#grid").drawTable(ns.opt);
+    }
+
+    ns.getSelectIDs = function () {
+    var ids = "";
+    $("#grid tbody").find("input[type=checkbox]:checked").each(function (i, e) {
+    ids += $(e).attr("data-id") + "','";
+    })
+    ids = ids.substr(0, ids.length - 3);
+    return ids;
+    }
+
+
+
+    ns.searchTable = function () {
+    ns.opt.data.combinSearchText = ns.getCondition();
+    ns.opt.data.pageNo = 1;
+    ns.refreshTable();
+    }
+
+    //新增、编辑
+    ns.edit = function (id) {
+    var title='@Model.ConfigInfo.TableComment';
+    if(id && id.length > 0){
+    title='编辑'+title;
+    }else{
+    title='新增'+title;
+    }
+    var index = layer.open({
+    type: 2,
+    title: title,
+    area: ['1024px', '665px'], //自定义文本域宽高
+    maxmin: true,
+    content: ['/@Model.ConfigInfo.ModelFolderName/@Model.ConfigInfo.ControllerName/Edit?@Model.ConfigInfo.PKName=' + id, 'no'],
+    btn: ['确定', '关闭'],
+    success: function (layero, index) {
+
+    },
+    yes: function (index, layero) {
+    var iframeWin = window[layero.find('iframe')[0]['name']];
+    iframeWin.@(Model.OName.Substring(0, (Model.OName.Length - 4)))Edit.submitPage();
+    }
+    });
+    }
+
+    //删除
+    ns.delete = function () {
+    var ids = ns.getSelectIDs();
+
+    if (ids == "") {
+    window.Pantosoft.IT.Utility.alertDelete();
+    return false;
+    }
+
+    Pantosoft.IT.Utility.deleteRecord({
+    url: "/@Model.ConfigInfo.ModelFolderName/@Model.ConfigInfo.ControllerName/Delete",
+    param: { ids: ids },
+    success: function (data) {
+    ns.refreshTable();
+    }
+    });
+    }
+
+    //选择教职工
+    ns.SelectEmployee = function () {
+
+    var index = top.layer.open({
+    type: 2,
+    title: "选择教职工",
+    area: ['1024px', '665px'], //自定义文本域宽高
+    maxmin: true,
+    content: ["/SelectEmployee/SelectEmployee?type=single", 'no'],
+    btn: ['确定', '清空', '关闭'],
+    yes: function (index, layero) {
+    //当前的iframe
+    var iframeWin = top.window[layero.find('iframe')[0]['name']];
+    var listEmployee = iframeWin.SelectEmployee.getEmployee();
+    if (listEmployee) {
+    $('#EmployeeName').val(listEmployee[0].Name);
+    $('#EmployeeID').val(listEmployee[0].EmployeeID);
+    }
+    top.layer.close(index);
+    ns.searchTable();
+    },
+    btn2: function (index, layero) {
+    $('#EmployeeName').val('');
+    $('#EmployeeID').val('');
+    top.layer.close(index);
+    ns.searchTable();
+    }
+    });
+    }
+
+    })(@Model.OName);

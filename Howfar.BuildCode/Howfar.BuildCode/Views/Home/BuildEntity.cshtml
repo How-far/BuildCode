@@ -23,26 +23,27 @@
 
 </head>
 <body>
-    <pre id="editor"><textarea>
-using Panto.Map.Extensions.DAL;
-using System;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-using PDRZ.Integration.Entity.School.Base;
+    @*<pre id="editor"><textarea>
+        using Panto.Map.Extensions.DAL;
+        using System;
+        using System.ComponentModel;
+        using System.Runtime.Serialization;
+        using PDRZ.Integration.Entity.School.Base;
 
-namespace PDRZ.Integration.Entity.School.@Model.ConfigInfo.ModelFolderName
-{
-    /// &ltsummary>
-    /// @Model.ConfigInfo.EntityName 的实体类
-    /// &lt/summary>
-    [DataContract]
-    [Serializable]
-    [DataEntity(Alias = "@Model.ConfigInfo.TableName")]
-    public partial class @Model.ConfigInfo.EntityName : WithSchoolIDBaseEntity
-    {
-@ViewBag.NormalContent
-    }
-}</textarea></pre>
+        namespace PDRZ.Integration.Entity.School.@Model.ConfigInfo.ModelFolderName
+        {
+            /// &ltsummary>
+            /// @Model.ConfigInfo.EntityName 的实体类
+            /// &lt/summary>
+            [DataContract]
+            [Serializable]
+            [DataEntity(Alias = "@Model.ConfigInfo.TableName")]
+            public partial class @Model.ConfigInfo.EntityName : WithSchoolIDBaseEntity
+            {
+        @ViewBag.NormalContent
+            }
+        }</textarea></pre>*@
+    <pre id="editor"><textarea>@ViewBag.NormalContent</textarea></pre>
     <script src="~/Scripts/ace/ace.js"></script>
     <script src="~/Scripts/ace/ext-language_tools.js"></script>
 

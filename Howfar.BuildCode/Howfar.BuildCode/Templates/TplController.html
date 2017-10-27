@@ -1,0 +1,133 @@
+﻿using PDRZ.Integration.BLL.School.@Model.ConfigInfo.ModelFolderName;
+using PDRZ.Integration.Entity.TransferData.Base;
+using PDRZ.Integration.Entity.School.@Model.ConfigInfo.ModelFolderName;
+using PDRZ.IntegrationController.Attribute;
+using System;
+using System.Web.Mvc;
+@(Model.ConfigInfo.IsViewData ? "using PDRZ.Integration.Entity.TransferData.School." + Model.ConfigInfo.ModelFolderName + ";" : "")
+
+namespace PDRZ.IntegrationController.School.@Model.ConfigInfo.ModelFolderName
+{
+    public class @(Model.ConfigInfo.ControllerName)Controller : BaseController
+    {
+    private @(Model.ConfigInfo.EntityName)BLL BLL = new  @(Model.ConfigInfo.EntityName)BLL();
+    @(Model.ConfigInfo.IsViewData ? "private DataDictionaryBLL dyBLL = new DataDictionaryBLL();" : "")
+
+    /// <summary>
+    /// 列表 页面
+    ///</summary>
+    /// <returns></returns>
+    [ActionPermission]
+    public ActionResult Manage()
+    {
+    return View("~/@Model.ConfigInfo.FolderPath/@Model.ConfigInfo.PageName@("List.cshtml")");
+    }
+
+    /// &ltsummary>
+    /// 获取列表信息
+    /// &lt/summary>
+    /// &ltparam name="combinSearchText">&lt/param>
+    /// &ltparam name="pageNo">&lt/param>
+    /// &ltparam name="pageSize">&lt/param>
+    /// <returns></returns>
+    public JsonResult GetPageList(string combinSearchText, int pageNo, int pageSize, string orderSeq)
+    {
+    SearchParam param = new SearchParam()
+    {
+    PageIndex = pageNo - 1,
+    PageSize = pageSize,
+    OrderSeq = orderSeq
+    };
+    var list = BLL.GetPageList(param, combinSearchText, this.SchoolID);
+    return new JsonResult()
+    {
+    Data = new
+    {
+    body = new
+    {
+    total = param.TotalRecords,
+    pageNum = param.PageIndex + 1,
+    pageSize = param.PageSize,
+    pages = param.CalcPageCount(),
+    list = list
+    }
+    },
+    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+    };
+    }
+
+    /// &ltsummary>
+    /// 编辑 页面
+    /// &lt/summary>
+    /// <returns></returns>
+    [ActionPermission]
+    public ActionResult Edit(@Model.ConfigInfo.EntityName Entity)
+    {
+    @(Model.ConfigInfo.IsViewData ? Model.ConfigInfo.EntityName + "ViewData  vd = new " + @Model.ConfigInfo.EntityName + "ViewData();" : "")
+
+    @(Model.ConfigInfo.IsViewData ? "vd.Entity" : "Entity") = Entity.@Model.ConfigInfo.PKName != Guid.Empty ? BLL.GetEntity(Entity.@Model.ConfigInfo.PKName) : Entity;
+    return View("~/@Model.ConfigInfo.FolderPath/@Model.ConfigInfo.PageName@("Edit.cshtml")", @(Model.ConfigInfo.IsViewData ? "vd" : "Entity"));
+    }
+
+    /// &ltsummary>
+    /// 新增/更新  信息
+    /// &lt/summary>
+    /// <returns></returns>
+    [ValidateAntiForgeryToken]
+    public JsonResult EditInfo(@Model.ConfigInfo.EntityName Entity)
+    {
+    StringResult Result = new StringResult();
+    string isInsert = Entity.@Model.ConfigInfo.PKName == Guid.Empty ? "新增" : "更新";
+    Entity.SchoolID = SchoolID;
+
+    //if (BLL.CheckRepeatName(Entity))
+    //{
+    //    Result.Message = "名称已存在！";
+    //    return Json(Result);
+    //}
+    int iResult = 0;
+    if (isInsert.Contains("新增"))
+    {
+    Entity.@Model.ConfigInfo.PKName = Guid.NewGuid();
+    Entity.CreateUser = UserInfo.UserID.ToString();
+    iResult = BLL.Insert(Entity);
+    }
+    else
+    {
+    //Entity.SetNullabledNeedUpdateField(null, false);
+    Entity.UpdateUser = UserInfo.UserID.ToString();
+    iResult = BLL.Update(Entity);
+    }
+
+    Result.Flag = iResult > 0 ? FlagStatus.OK : FlagStatus.NO;
+    Result.Message = isInsert;
+    Result.Message += iResult > 0 ? "成功！" : "失败！";
+
+    return Json(Result);
+    }
+
+    /// &ltsummary>
+    /// 批量删除
+    /// &lt/summary>
+    /// &ltparam name="Entity">&lt/param>
+    /// <returns></returns>
+    [ActionPermission]
+    public JsonResult Delete(string Ids)
+    {
+    StringResult Result = new StringResult();
+    Result.Flag = FlagStatus.NO;
+
+    if (BLL.BatchDelete(Ids))
+    {
+    Result.Flag = FlagStatus.OK;
+    Result.Message = "删除成功！";
+    }
+    else
+    {
+    Result.Message = "删除失败！";
+    }
+    return Json(Result);
+    }
+
+    }
+    }

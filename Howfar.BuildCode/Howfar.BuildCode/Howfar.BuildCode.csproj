@@ -50,6 +50,10 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="RazorEngine, Version=3.10.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\packages\RazorEngine.3.10.0\lib\net45\RazorEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -586,6 +590,9 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\vue.js" />
+    <Content Include="Templates\TplController.html" />
+    <Content Include="Templates\TplController.txt" />
+    <Content Include="Templates\TplEntity.txt" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -612,6 +619,8 @@
     <Content Include="Views\Home\BuildEditJS.cshtml" />
     <Content Include="Views\Home\BuildEntityViewData.cshtml" />
     <Content Include="Views\Home\BuildMenuSql.cshtml" />
+    <Content Include="Templates\TplEntity.cshtml" />
+    <Content Include="Templates\TplListJs.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
