@@ -11,7 +11,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
 using System.Xml;
-using RazorEngine;
 
 namespace Howfar.BuildCode.Controllers
 {
@@ -269,19 +268,11 @@ namespace Howfar.BuildCode.Controllers
         #region · BuildListJS
         public ActionResult BuildListJS()
         {
-            //ViewBag.ListJSTitleContent = ListJS();
+            ViewBag.ListJSTitleContent = ListJS();
             Table Entity = new Table();
             Entity.EntityList = StaticDataList;
             Entity.ConfigInfo = StaticConfigInfo;
-            var ListJSCond = "";
-            var ListJSTitleContent = "";
-            List<Table> List = StaticDataList.Where(t => t.IsShow == true).ToList();
-            //ViewBag.ListJSCond = ListJSCond();
-            string OName = StaticConfigInfo.PageName + "List";
-            string tplPath = Server.MapPath("~/Templates/") + "TplListJs.cshtml";
-            string tpl = System.IO.File.ReadAllText(tplPath);
-            string content = Razor.Parse(tpl, new { OName, List, ListJSCond, ConfigInfo = StaticConfigInfo });
-            ViewBag.content = content;
+            ViewBag.ListJSCond = ListJSCond();
             return View(Entity);
         }
 
@@ -344,12 +335,8 @@ namespace Howfar.BuildCode.Controllers
         public ActionResult BuildEntity()
         {
             Table Entity = new Table();
-            var ColList = StaticDataList.Where(t => t.IsDataColumn == true).ToList();
-            var ExtColList = StaticDataList.Where(t => t.IsDataColumn == false).ToList();
-            string tplPath = Server.MapPath("~/Templates/") + "TplEntity.cshtml";
-            string tpl = System.IO.File.ReadAllText(tplPath);
-            string content = Razor.Parse(tpl, new { ColList, ExtColList, ConfigInfo = StaticConfigInfo });
-            ViewBag.NormalContent = content;
+            ViewBag.NormalContent = strNormalEntity();
+            Entity.ConfigInfo = StaticConfigInfo;
             return View(Entity);
         }
         public string strNormalEntity()
@@ -449,12 +436,7 @@ namespace Howfar.BuildCode.Controllers
         {
             Table Entity = new Table();
             Entity.ConfigInfo = StaticConfigInfo;
-            //ViewBag.strControllerCode = strControllerCode();
-            string tplPath = Server.MapPath("~/Templates/") + "TplController.txt";
-            string tpl = System.IO.File.ReadAllText(tplPath);
-            string content = Razor.Parse(tpl, Entity);
-            //return Content(content);
-            ViewBag.strControllerCode = content;
+            ViewBag.strControllerCode = strControllerCode();
             return View(Entity);
         }
 
