@@ -132,7 +132,7 @@ namespace Howfar.BuildCode.Controllers
                     }
                 }
 
-                if (StaticConfigInfo.EventName != "CreateTable" && StaticConfigInfo.PKName.Length < 0)
+                if (StaticConfigInfo.EventName != "CreateTable" && StaticConfigInfo.PKName?.Length < 0)
                 {
                     return "未获取到主键！";
                 }
@@ -304,13 +304,13 @@ namespace Howfar.BuildCode.Controllers
                 sb.Add(string.Format("               align: '{0}',", align));
                 if (item.TypeName.ToLower().Contains("date"))
                 {
-                    sb.Add("            fn: function (e) {");
-                    sb.Add("                if (e != null && e != '') {");
-                    sb.Add($"                   return $.JsonToDateTimeString(e, 'yyyy-MM-dd');");
-                    sb.Add("                } else {");
-                    sb.Add($"                   return '';");
-                    sb.Add("                }");
-                    sb.Add("            }");
+                    sb.Add("               fn: function (e) {");
+                    sb.Add("                  if (e != null && e != '') {");
+                    sb.Add($"                     return $.JsonToDateTimeString(e, 'yyyy-MM-dd');");
+                    sb.Add("                  } else {");
+                    sb.Add($"                     return '';");
+                    sb.Add("                  }");
+                    sb.Add("               }");
                 }
                 sb.Add(string.Format("            }}{0}", (Index + 1) == Count ? "" : ","));
                 Index++;
@@ -393,6 +393,7 @@ namespace Howfar.BuildCode.Controllers
         {
             Table Entity = new Table();
             Entity.ConfigInfo = StaticConfigInfo;
+            Entity.EntityList = StaticDataList;
             var t = strDalContent();
             ViewBag.sbCond = t.Item1;
             ViewBag.sbParam = t.Item2;

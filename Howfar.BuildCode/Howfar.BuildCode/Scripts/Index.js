@@ -129,7 +129,8 @@ function createVue(data) {
                         ParentName: name,
                         ColumnName: name.substr(0, name.length - 2) + 'Name',
                         Comment: comment.substr(0, comment.length - 2) + '名称',
-                        TypeName: 'nvarchar'
+                        TypeName: 'nvarchar',
+                        MaxLength:50
                     });
                 } else {
                     toastr['error']("只有列名中含有“ID” 才可追加扩展字段");

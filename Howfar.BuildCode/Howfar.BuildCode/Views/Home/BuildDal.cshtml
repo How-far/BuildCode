@@ -46,7 +46,7 @@ namespace PDRZ.Integration.Dal.School.@Model.ConfigInfo.ModelFolderName
         public List<@Model.ConfigInfo.EntityName> GetPageList(SearchParam param, string json, Guid schoolID)
         {
             JObject jo = JObject.Parse(json);
-            string sql = @@" SELECT * FROM @Model.ConfigInfo.TableName a Where a.SchoolID=@@SchoolID ";
+            string sql = @@" SELECT @(string.Join(",",Model.EntityList.Where(t=>t.IsShow).Select(t=>"a."+t.ColumnName))) FROM @Model.ConfigInfo.TableName a Where a.SchoolID=@@SchoolID ";
 @ViewBag.sbCond
             return SortPageHelper.GetList<@Model.ConfigInfo.EntityName>(sql, new
             {

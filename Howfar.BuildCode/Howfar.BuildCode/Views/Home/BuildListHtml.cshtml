@@ -46,14 +46,6 @@
 &ltscript type="text/javascript" src="@@Url.Content("~/Scripts/@Model.ConfigInfo.FolderPath/@Model.ConfigInfo.PageName@("List.js")")">&lt/script>
 @@Html.AntiForgeryToken()
 <div class="container-fluid" style="height: calc(100%);">
-    <div class="row">
-        <div class="col-xs-12 catalog clearfix">
-            <i class="current"></i>
-            <p>
-                <span class="catalog-parent">教科</span><strong>></strong><span class="catalog-child">@Model.ConfigInfo.TableComment</span>
-            </p>
-         </div>
-    </div>
     <div class="row main user">
         <div class="col-xs-12 info-left">
             <div id="grid" class="col-sm-12 infoMain commonStyle staff active">
