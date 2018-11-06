@@ -32,7 +32,7 @@
 }
 
 &ltscript type="text/javascript" src="@@Url.Content("~/Scripts/@Model.ConfigInfo.FolderPath/@Model.ConfigInfo.PageName@("Edit.js")")&quot>&lt/script>
-<form class="formCommon addStaff" method="post" action="/@Model.ConfigInfo.ModelFolderName/@Model.ConfigInfo.ControllerName/EditInfo" id="formEdit" style="margin-top:15px;">
+<form class="formCommon addStaff" method="post" action="/@Model.ConfigInfo.ModelFolderName/@Model.ConfigInfo.ControllerName/EditInfo" id="formEdit" style="padding-top:35px !important;">
 @@Html.AntiForgeryToken()
     <input type="hidden" id="@Model.ConfigInfo.PKName" name="@Model.ConfigInfo.PKName" value="@(Model.ConfigInfo.IsViewData?"@Model.Entity.":"@Model.")@(Model.ConfigInfo.PKName)" />
 
