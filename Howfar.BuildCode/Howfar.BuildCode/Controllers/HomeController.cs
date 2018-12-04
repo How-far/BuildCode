@@ -144,6 +144,11 @@ namespace Howfar.BuildCode.Controllers
             }
         }
 
+        public string Tab(int i)
+        {
+            return new string(' ', i * 4);
+        }
+
         #region · GetPKList
         public List<Table> GetPKList(string TableName)
         {
@@ -526,22 +531,57 @@ namespace Howfar.BuildCode.Controllers
         public ActionResult BuildMenuSql(string id)
         {
             List<string> List = new List<string>();
+
+            DataTable dtTop = CPQuery.From("SELECT * FROM dbo.PDRZ_SystemModule WHERE ParentID=@NodeID OR NodeID=@NodeID ORDER BY NodeType,OrderNo", new { NodeID = id }).FillDataTable();
             DataTable dtMenu = CPQuery.From("SELECT * FROM dbo.PDRZ_Menu WHERE MenuID =@MenuID", new { MenuID = id }).FillDataTable();
             DataTable dtFunction = CPQuery.From("SELECT * FROM dbo.PDRZ_MenuFunction WHERE MenuID = @MenuID", new { MenuID = id }).FillDataTable();
 
-            foreach (DataRow dr in dtMenu.Rows)
+            bool IsBuildTop = dtTop.Rows.Count > 0;
+            if (dtTop.Rows.Count <= 0 && dtMenu.Rows.Count > 0)
             {
-                List.Add($"-- 菜单 {dr[1]}");
-                List.Add($"DELETE FROM dbo.PDRZ_Menu WHERE MenuID ='{dr[0]}'");
-                List.Add($"INSERT INTO PDRZ_Menu SELECT '{dr[0]}', '{dr[1]}', '{dr[2]}', '{dr[3]}', '{dr[4]}', '{dr[5]}', {dr[6]}, '{dr[7]}', GETDATE(), '', ''");
+                dtTop = CPQuery.From("SELECT * FROM dbo.PDRZ_SystemModule WHERE ParentID=@NodeID OR NodeID=@NodeID ORDER BY NodeType,OrderNo", new { NodeID = dtMenu.Rows[0][3].ToString() }).FillDataTable();
             }
-            foreach (DataRow dr in dtFunction.Rows)
+
+            foreach (DataRow drTop in dtTop.Rows)
             {
-                List.Add($"-- {dr[1]}");
-                List.Add($"DELETE  FROM PDRZ_MenuFunction WHERE FunctionID = '{dr[0]}';");
-                List.Add($"INSERT INTO PDRZ_MenuFunction SELECT '{dr[0]}', '{dr[1]}', '{dr[2]}', {dr[3]}, '{dr[4]}', '{dr[5]}', GETDATE(), '', '', '{dr[9]}'");
+                int ti = 1;
+                if (IsBuildTop)
+                {
+                    List.Add($"-- 模块 {drTop[1]}");
+                    List.Add($"DELETE FROM dbo.PDRZ_SystemModule WHERE NodeID ='{drTop[0]}';");
+                    List.Add($"INSERT INTO PDRZ_SystemModule SELECT '{drTop[0]}', '{drTop[1]}', '{drTop[2]}', {(!string.IsNullOrWhiteSpace(drTop[3].ToString()) ? $"'{drTop[3].ToString()}'" : "NULL")}, '{drTop[4]}', '{drTop[5]}', '',  GETDATE(), '', '';");
+                }
+                else
+                {
+                    ti = 0;
+                }
+
+                dtMenu = CPQuery.From("SELECT * FROM dbo.PDRZ_Menu WHERE NodeID =@NodeID ORDER BY OrderNo", new { NodeID = drTop[0] }).FillDataTable();
+                foreach (DataRow dr in dtMenu.Rows)
+                {
+
+                    if (!IsBuildTop && (dr[0].ToString().ToLower() != id.ToLower())) continue;
+
+                    List.Add($"{Tab(ti)}-- 菜单 {dr[1]}");
+                    List.Add($"{Tab(ti)}DELETE FROM dbo.PDRZ_Menu WHERE MenuID ='{dr[0]}';");
+                    List.Add($"{Tab(ti)}INSERT INTO PDRZ_Menu SELECT '{dr[0]}', '{dr[1]}', '{dr[2]}', '{dr[3]}', '{dr[4]}', '{dr[5]}', '{dr[6]}', '{dr[7]}', GETDATE(), '', '';");
+
+                    dtFunction = CPQuery.From("SELECT * FROM dbo.PDRZ_MenuFunction WHERE MenuID = @MenuID", new { MenuID = dr[0] }).FillDataTable();
+
+                    foreach (DataRow drFun in dtFunction.Rows)
+                    {
+                        List.Add($"{Tab(ti + 1)}-- {drFun[1]}");
+                        List.Add($"{Tab(ti + 1)}DELETE  FROM PDRZ_MenuFunction WHERE FunctionID = '{drFun[0]}';");
+                        List.Add($"{Tab(ti + 1)}INSERT INTO PDRZ_MenuFunction SELECT '{drFun[0]}', '{drFun[1]}', '{drFun[2]}', '{drFun[3]}', '{drFun[4]}', '{drFun[5]}', GETDATE(), '', '', '{drFun[9]}';");
+                    }
+                    List.Add("\r\n");
+                }
+
             }
-            ViewBag.SQLContent = string.Join("\r\n", List);
+
+
+
+            ViewBag.SQLContent = string.Join("\r\n", List) + "\r\n";
             return View();
         }
         #endregion
