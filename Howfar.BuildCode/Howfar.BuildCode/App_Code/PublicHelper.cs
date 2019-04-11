@@ -75,7 +75,7 @@ namespace Howfar.BuildCode.App_Code
                 case "text": csharpType = "string"; break;
                 case "time": csharpType = "TimeSpan"; break;
                 case "timestamp": csharpType = "byte[]"; break;
-                case "tinyint": csharpType = "byte"; break;
+                case "tinyint": csharpType = "byte" + strNull; break;
                 case "uniqueidentifier": csharpType = "Guid" + strNull; break;
                 case "varbinary": csharpType = "byte[]"; break;
                 case "varchar": csharpType = "string"; break;
@@ -122,6 +122,51 @@ EXEC sp_addextendedproperty N'MS_Description', N'创建人', 'SCHEMA', N'dbo', '
 EXEC sp_addextendedproperty N'MS_Description', N'创建时间', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'CreateDate' 
 EXEC sp_addextendedproperty N'MS_Description', N'修改人', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'UpdateUser' 
 EXEC sp_addextendedproperty N'MS_Description', N'修改时间', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'UpdateDate' ");
+            CPQuery.From(string.Join("", strCreateTable)).ExecuteNonQuery();
+            CPQuery.From(string.Join("", strCreateComment)).ExecuteNonQuery();
+            return string.Join("\r\n", strCreateTable) + string.Join("\r\n", strCreateComment);
+        }
+
+        public static string CreateTable2(List<Table> List, ConfigInfo Config)
+        {
+            List<string> strCreateTable = new List<string>();
+            List<string> strCreateComment = new List<string>();
+
+            List = List.Where(t => t.IsDataColumn == true).ToList(); //过滤非数据库字段
+
+            if (CPQuery.From($"SELECT  COUNT(1) FROM dbo.SysObjects WHERE ID = object_id(N'[{Config.TableName.Trim()}]') ").ExecuteScalar<int>() > 0)
+            {
+                return Config.TableName + "已存在！";
+            }
+
+            strCreateTable.Add($"CREATE TABLE [dbo].[{Config.TableName.Trim()}](");
+            strCreateTable.Add($"[ID] uniqueidentifier Not Null ,");
+            strCreateComment.Add($"EXEC sp_addextendedproperty N'MS_Description', N'{Config.TableComment}', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', NULL, NULL; ");
+            strCreateComment.Add($"EXEC sp_addextendedproperty N'MS_Description', N'主键', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'ID'; ");
+
+            foreach (var item in List)
+            {
+                string length = item.TypeName.Contains("varchar") ? $"({item.MaxLength.ToString()})" : "";
+                strCreateTable.Add(string.Format($"[{item.ColumnName.Trim()}] {item.TypeName}{{0}} {{1}} {{2}},",
+                    length,
+                    item.NotNUll ? "Not Null" : "Null",
+                    item.DefaultValue?.Length > 0 ? $"'{item.DefaultValue}'" : ""
+                    ));
+                strCreateComment.Add($"EXEC sp_addextendedproperty N'MS_Description', N'{item.Comment}', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName.Trim()}', 'COLUMN', N'{item.ColumnName.Trim()}'; ");
+            }
+            strCreateTable.Add(@"[Timestamp] [timestamp] NULL,
+[IsDeleted] [bit] NOT NULL DEFAULT 0,
+[CreateUser] [nvarchar] (50) COLLATE Chinese_PRC_CI_AS NULL,
+[CreateTime] [datetime] NULL,
+[UpdateUser] [nvarchar] (50) COLLATE Chinese_PRC_CI_AS NULL,
+[UpdateTime] [datetime] NULL,");
+            strCreateTable.Add($"PRIMARY KEY ( [ID] ));\r\n");
+            strCreateComment.Add($@"EXEC sp_addextendedproperty N'MS_Description', N'时间戳', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'Timestamp' 
+EXEC sp_addextendedproperty N'MS_Description', N'是否删除', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'IsDeleted' 
+EXEC sp_addextendedproperty N'MS_Description', N'创建人', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'CreateUser' 
+EXEC sp_addextendedproperty N'MS_Description', N'创建时间', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'CreateTime' 
+EXEC sp_addextendedproperty N'MS_Description', N'修改人', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'UpdateUser' 
+EXEC sp_addextendedproperty N'MS_Description', N'修改时间', 'SCHEMA', N'dbo', 'TABLE', N'{Config.TableName}', 'COLUMN', N'UpdateTime' ");
             CPQuery.From(string.Join("", strCreateTable)).ExecuteNonQuery();
             CPQuery.From(string.Join("", strCreateComment)).ExecuteNonQuery();
             return string.Join("\r\n", strCreateTable) + string.Join("\r\n", strCreateComment);

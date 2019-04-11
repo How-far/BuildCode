@@ -286,7 +286,10 @@
             </div>
             <div id="tab-2" class="tab-pane" style="height:100%;">
                 <div class="panel-body" style="height:100%;">
-                    <button class="btn-success" onclick="setData('BuildEntity');" id="btnBuildEntity">Build Code</button>
+                    <div>
+                        <button class="btn-success" onclick="setData('BuildEntity');" id="btnBuildEntity">Build Code</button>
+                        <p style="color:red;display: initial;">默认字段不需要添加，也不展示。注意命名空间：ModelFolderName</p>
+                    </div>
                     <iframe id="iframeBuildEntity" style="width:100%;height:100%;border:none;"></iframe>
                 </div>
             </div>

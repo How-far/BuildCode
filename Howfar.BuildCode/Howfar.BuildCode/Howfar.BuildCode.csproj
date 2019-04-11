@@ -612,6 +612,7 @@
     <Content Include="Views\Home\BuildEditJS.cshtml" />
     <Content Include="Views\Home\BuildEntityViewData.cshtml" />
     <Content Include="Views\Home\BuildMenuSql.cshtml" />
+    <Content Include="Views\Home\BuildEntity2.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

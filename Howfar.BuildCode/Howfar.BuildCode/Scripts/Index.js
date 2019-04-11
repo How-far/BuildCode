@@ -86,6 +86,7 @@ function createVue(data) {
                 element.addClass('active');
                 $('#txtTableName').val(tableName);
                 $('#txtEntityName').val(tableName.substr(tableName.indexOf('_') + 1));
+                $('#txtPageName').val(tableName.substr(tableName.indexOf('_') + 1));
                 $('#txtTableComment').val(tablecomment);
                 storage["SearchText"] = $("#txtSearch").val();
 

@@ -1,0 +1,74 @@
+﻿@model Howfar.BuildCode.Models.Table
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Editor</title>
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+        }
+
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+
+</head>
+<body>
+    <pre id="editor"><textarea>
+using System;
+using SqlSugar;
+
+namespace Diagnosis.Domain.Entity.@(Model.ConfigInfo.ModelFolderName)
+{
+    /// &ltsummary>
+    /// @(Model.ConfigInfo.EntityName) 的实体类
+    /// &lt/summary>
+
+    [SugarTable("@(Model.ConfigInfo.TableName)")]
+    public class @(Model.ConfigInfo.EntityName) : BaseEntity
+    {
+@ViewBag.NormalContent
+    }
+    /// &ltsummary>
+    /// @(Model.ConfigInfo.EntityName) 的扩展
+    /// &lt/summary>
+    public class @(Model.ConfigInfo.EntityName)Ext : @(Model.ConfigInfo.EntityName)
+    {
+    }
+}</textarea></pre>
+    <script src="~/Scripts/ace/ace.js"></script>
+    <script src="~/Scripts/ace/ext-language_tools.js"></script>
+
+    <script>
+        var editor = ace.edit("editor");
+        //设置风格和语言（更多风格和语言，请到github上相应目录查看）
+        theme = "xcode"
+        language = "csharp"//"csharp"
+        editor.setTheme("ace/theme/" + theme);
+        editor.session.setMode("ace/mode/" + language);
+        ace.require("ace/ext/language_tools");
+        //字体大小
+        editor.setFontSize(13);
+
+        //设置只读（true时只读，用于展示代码）
+        editor.setReadOnly(false);
+
+        //自动换行,设置为off关闭
+        editor.setOption("wrap", "free")
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+    </script>
+</body>
+</html>

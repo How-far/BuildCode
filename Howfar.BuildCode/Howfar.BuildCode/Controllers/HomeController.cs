@@ -348,46 +348,13 @@ namespace Howfar.BuildCode.Controllers
         {
             List<string> sb = new List<string>();
             List<Table> List = StaticDataList.Where(t => t.IsDataColumn == true).ToList();
-            sb.Add("        #region 标准字段");
             foreach (var item in List)
             {
                 sb.Add("        /// <summary>");
                 sb.Add($"        /// {item.Comment}");
                 sb.Add("        /// </summary>");
-                sb.Add("        [DataMember] ");
-                if (item.IsDataColumn && item.IsPK.Value)
-                {
-                    sb.Add("        [DataColumn(PrimaryKey = true)] ");
-                }
-                else if (item.IsDataColumn)
-                {
-                    sb.Add(string.Format("        [DataColumn(IsNullable = {0})] ", item.NotNUll ? "false" : "true"));
-                }
-                sb.Add($"        [Description(\"{item.Comment}\")] ");
                 sb.Add($"        public {item.CsharpType} {item.ColumnName} {{ get; set; }}");
             }
-            sb.Add("        #endregion");
-            sb.Add("");
-            sb.Add("        #region 扩展字段");
-            List = StaticDataList.Where(t => t.IsDataColumn == false).ToList();
-            foreach (var item in List)
-            {
-                sb.Add("        /// <summary>");
-                sb.Add($"        /// {item.Comment}");
-                sb.Add("        /// </summary>");
-                sb.Add("        [DataMember] ");
-                if (item.IsDataColumn && item.IsPK.Value)
-                {
-                    sb.Add("        [DataColumn(PrimaryKey = true)] ");
-                }
-                else if (item.IsDataColumn)
-                {
-                    sb.Add(string.Format("        [DataColumn(IsNullable = {0})] ", item.NotNUll ? "false" : "true"));
-                }
-                sb.Add($"        [Description(\"{item.Comment}\")] ");
-                sb.Add($"        public {item.CsharpType} {item.ColumnName} {{ get; set; }}");
-            }
-            sb.Add("        #endregion");
             return string.Join("\r\n", sb);
         }
         #endregion

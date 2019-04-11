@@ -56,7 +56,7 @@ namespace Howfar.BuildCode.Controllers
         #region 获取字段
         public JsonResult GetTableDetail(string TableName)
         {
-            var strExclude = new string[] { "Timestamp", "SchoolID", "CreateUser", "CreateDate", "UpdateUser", "UpdateDate" };
+            var strExclude = new string[] { "ID", "Timestamp", "", "IsDeleted", "CreateTime", "CreateUser", "UpdateUser", "UpdateTime" };
 
             string strSQL = $@"  SELECT  '{TableName}' AS TableName,
                                         c.name AS ColumnName ,
