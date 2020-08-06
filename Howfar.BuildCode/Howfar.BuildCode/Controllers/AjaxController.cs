@@ -1,10 +1,7 @@
-﻿using Howfar.BuildCode.Models;
-using Panto.Map.Extensions.DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
+using Howfar.BuildCode.Models;
+using Panto.Map.Extensions.DAL;
 
 namespace Howfar.BuildCode.Controllers
 {
@@ -109,6 +106,8 @@ namespace Howfar.BuildCode.Controllers
                         break;
                     case "decimal":
                         item.MaxLength = $"({item.Precision},{item.Scale})";
+                        break;
+                    case "varchar":
                         break;
                     default:
                         item.MaxLength = string.Empty;
