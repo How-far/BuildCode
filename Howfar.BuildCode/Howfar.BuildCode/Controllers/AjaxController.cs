@@ -71,7 +71,7 @@ namespace Howfar.BuildCode.Controllers
                                         c.is_sparse ,
                                         c.is_column_set ,
                                         c.is_filestream ,
-                                        CAST(ep.value AS NVARCHAR(MAX)) AS Comment,
+                                         case when LEN(CAST(ep.value AS NVARCHAR(MAX)))<=0 or ep.value is null then c.Name else CAST(ep.value AS NVARCHAR(MAX)) END AS Comment,
                                         CAST(CASE WHEN c.is_nullable=0 THEN 1 ELSE 0 END AS BIT) AS NotNUll,
                                         1 AS IsCheck,
                                         1 AS IsDataColumn
