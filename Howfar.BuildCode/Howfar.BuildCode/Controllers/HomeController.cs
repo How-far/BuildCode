@@ -1,16 +1,14 @@
-﻿using Howfar.BuildCode.App_Code;
-using Howfar.BuildCode.Models;
-using Panto.Map.Extensions.DAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Web;
 using System.Web.Mvc;
-using System.Configuration;
 using System.Xml;
+using Howfar.BuildCode.App_Code;
+using Howfar.BuildCode.Models;
+using Panto.Map.Extensions.DAL;
 
 namespace Howfar.BuildCode.Controllers
 {
@@ -348,13 +346,46 @@ namespace Howfar.BuildCode.Controllers
         {
             List<string> sb = new List<string>();
             List<Table> List = StaticDataList.Where(t => t.IsDataColumn == true).ToList();
+            sb.Add("        #region 标准字段");
             foreach (var item in List)
             {
                 sb.Add("        /// <summary>");
                 sb.Add($"        /// {item.Comment}");
                 sb.Add("        /// </summary>");
+                sb.Add("        [DataMember] ");
+                if (item.IsDataColumn && item.IsPK.Value)
+                {
+                    sb.Add("        [DataColumn(PrimaryKey = true)] ");
+                }
+                else if (item.IsDataColumn)
+                {
+                    sb.Add(string.Format("        [DataColumn(IsNullable = {0})] ", item.NotNUll ? "false" : "true"));
+                }
+                sb.Add($"        [Description(\"{item.Comment}\")] ");
                 sb.Add($"        public {item.CsharpType} {item.ColumnName} {{ get; set; }}");
             }
+            sb.Add("        #endregion");
+            sb.Add("");
+            sb.Add("        #region 扩展字段");
+            List = StaticDataList.Where(t => t.IsDataColumn == false).ToList();
+            foreach (var item in List)
+            {
+                sb.Add("        /// <summary>");
+                sb.Add($"        /// {item.Comment}");
+                sb.Add("        /// </summary>");
+                sb.Add("        [DataMember] ");
+                if (item.IsDataColumn && item.IsPK.Value)
+                {
+                    sb.Add("        [DataColumn(PrimaryKey = true)] ");
+                }
+                else if (item.IsDataColumn)
+                {
+                    sb.Add(string.Format("        [DataColumn(IsNullable = {0})] ", item.NotNUll ? "false" : "true"));
+                }
+                sb.Add($"        [Description(\"{item.Comment}\")] ");
+                sb.Add($"        public {item.CsharpType} {item.ColumnName} {{ get; set; }}");
+            }
+            sb.Add("        #endregion");
             return string.Join("\r\n", sb);
         }
         #endregion
@@ -380,13 +411,12 @@ namespace Howfar.BuildCode.Controllers
             foreach (var item in List)
             {
                 string Islike = item.TypeName.Contains("char") ? $" LIKE '%' + @{item.ColumnName} + '%' " : $"= @{item.ColumnName}";
-                sbCond.Add($@"            string {item.ColumnName} =string.Empty;
-            if (jo[""{item.ColumnName}""] != null && !string.IsNullOrEmpty(jo[""{item.ColumnName}""].ToString()))
+                sbCond.Add($@"            string {item.ColumnName} =jo[""{item.ColumnName}""]?.ToString();
+            if (!string.IsNullOrEmpty({item.ColumnName}))
             {{
                    sql += "" AND a.{item.ColumnName} {Islike} "";
-                   {item.ColumnName} = jo[""{item.ColumnName}""].ToString();
              }}");
-                sbParam.Add($"                {item.ColumnName} = {item.ColumnName},");
+                sbParam.Add($"                {item.ColumnName},");
             }
             return new Tuple<string, string>(string.Join("\r\n", sbCond), string.Join("\r\n", sbParam));
         }

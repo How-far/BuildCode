@@ -35,7 +35,7 @@ $(function () {
 
     //编辑页面
     $(document).on("click", "#grid tbody tr td:nth-child(2) a", function () {
-        var id = $($(this).parent().parent().children()[0]).find("input").attr("data-id");
+        var id = $(this).parents('tr').eq(0).data('id');
         @OName@(".edit(id);")
     });
 
